@@ -120,7 +120,7 @@ fn main() {
         .version("0.1.0")
         .about("Fetch data feeds of dataplane.org")
         .author("Max Resing")
-        .arg("-o, --output=[FILE] 'Define an output directory'")
+        .arg("-o, --output=[DIR] 'Define an output directory'")
         .arg("-v, --verbose       'Set the output to verbose'")
         .get_matches();
 
