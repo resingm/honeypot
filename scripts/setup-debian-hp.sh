@@ -17,9 +17,11 @@ USAGE="Usage: $0 [-vh]"
 # Flags
 
 # Constants
-CONFIG_SSH = /etc/ssh/sshd_config
-CONFIG_TEL = /etc/telnet/config
-CONFIG_VNC = /etc/tigervnc/config
+CONFIG_SSH=/etc/ssh/sshd_config
+CONFIG_TEL=/etc/telnet/config
+CONFIG_VNC=/etc/tigervnc/config
+
+DIR_TEL=/home/$SUDO_USER/ftelnetd
 
 
 # --- Option processing --------------------------------------------
@@ -88,7 +90,7 @@ apt-get -qq dist-upgrade
 
 
 # --- Setup SSH honeypot -------------------------------------------
-echo "Setup SSH Honeypot:"
+echo "Setup SSH honeypot:"
 echo "  * Installing SSH server (openssh-server)"
 apt-get -qq install openssh-server
 
@@ -119,6 +121,13 @@ echo "PermitRootLogin prohibit-password" >> ${CONFIG_SSH}
 echo "PubkeyAuthentication yes" >> ${CONFIG_SSH}
 echo "PasswordAuthentication yes" >> ${CONFIG_SSH}
 echo "" >> ${CONFIG_SSH}
+echo "# Logging" >> ${CONFIG_SSH}
+echo "" >> ${CONFIG_SSH}
+echo "SyslogFacility AUTH" >> ${CONFIG_SSH}
+echo "LogLevel INFO" >> ${CONFIG_SSH}
+echo "" >> ${CONFIG_SSH}
+echo "# Misc" >> ${CONFIG_SSH}
+echo "" >> ${CONFIG_SSH}
 echo "ChallengeResponseAuthentication no" >> ${CONFIG_SSH}
 echo "UsePAM yes" >> ${CONFIG_SSH}
 echo "X11Forwarding yes" >> ${CONFIG_SSH}
@@ -131,27 +140,43 @@ echo "" >> ${CONFIG_SSH}
 echo "  * Enable sshd.service"
 systemctl enable sshd.service
 
-echo ""
 
 # --- Setup telnet honeypot ----------------------------------------
-echo "Setup Telnet Honeypot:"
+echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
-apt-get -qq install telnetd
+apt-get -qq install inetutils-telnetd
 
-echo "  * Backup ${CONFIG_TEL}"
-cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
+# echo "  * Backup ${CONFIG_TEL}"
+# cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
 
-echo "  * Configure telnetd"
+# echo "  * Configure telnetd"
 # TODO: Configure telnetd
 
-echo "  * Enable sshd.service"
-systemctl enable telnetd.service
+# echo "  * Enable sshd.service"
+# systemctl enable inetd.service
 
 echo ""
 
 # --- Setup VNC honeypot -------------------------------------------
 
+echo "Setup VNC honeypot"
+
+echo "  * Installing TightVNC"
+apt-get -qq install tightvncserver
+
 echo ""
 
 # --- Setup Logrotation --------------------------------------------
+
+
+# --- Setup Cronjobs -----------------------------------------------
+
+
+
+# --- Cleanup ------------------------------------------------------
+
+
+
+
+
