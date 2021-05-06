@@ -2,9 +2,25 @@
 
 # ------------------------------------------------------------------
 #
+# Setup script to automate the setup of a honeypot
 #
+# The script aims to automate the task of setting up a debian-based
+# honeypot. The honeypot will operate an SSH server, a Telnet server
+# and a VNC server (vncterm). The services will be served on their
+# default ports 22 (SSH), 23 (Telnet) and 5900 (VNC). Furthermore,
+# logrotation will be reconfigured, such that the two log files will
+# rotate each night. The log files will be filtered and transfered
+# to a central server each night.
 #
-# by Max Resing <m.resing-1@student.utwente.nl>
+# Log files:
+#  /var/log/auth.log -> sshd
+#  /var/log/syslog   -> telnetd, linuxvnc
+#
+# If you have any remarks on the script or any feedback, please do
+# not hesitate to contact the author of this script.
+#
+# The script was written and published
+#    by Max Resing <m.resing-1@student.utwente.nl>
 #
 # ------------------------------------------------------------------
 
