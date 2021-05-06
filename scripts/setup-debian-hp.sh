@@ -2,7 +2,7 @@
 
 # ------------------------------------------------------------------
 #
-# 
+#
 #
 # by Max Resing <m.resing-1@student.utwente.nl>
 #
@@ -17,15 +17,21 @@ USAGE="Usage: $0 [-vh]"
 # Flags
 
 # Constants
+DOTENV=/etc/honeypot/.env
+DIRECTORY=/etc/honeypot/
+VNC_SERVICE=vncservice.service
+
 CONFIG_SSH=/etc/ssh/sshd_config
 CONFIG_TEL=/etc/inetd.conf
 CONFIG_VNC=/etc/systemd/system/vncservice.service
 CONFIG_LOG=/etc/logrotate.conf
-VNC_SERVICE=vncservice.service
 
 URL_SSH=https://static.maxresing.de/pub/sshd_config
 URL_TEL=https://static.maxresing.de/pub/inetd.conf
 URL_VNC=https://static.maxresing.de/pub/vncservice
+URL_LOG=https://static.maxresing.de/pub/logrotate.conf
+
+SSH_KEY=/home/${SUDO_USER}/.ssh/id_honeypot
 
 
 # --- Option processing --------------------------------------------
@@ -85,12 +91,38 @@ fi
 
 echo "Performing general setup tasks:"
 
+echo "  * Create honeypot directory"
+mkdir -p ${DIRECTORY}
+
+echo "  * Create .env file"
+# Clean possibly existing .env from previous executions
+echo "" > ${DOTENT}
+
 echo "  * Updating system"
 apt-get -qq update
 apt-get -qq dist-upgrade
 
 # echo "  * Installing curl"
 # apt-get -qq install curl
+
+
+# --- Setup SSH honeypot -------------------------------------------
+
+echo "Requires user input"
+echo "If you have any doubts, please cancel the execution with CTRL+C"
+echo "and contact m.resing-1@student.utwente.nl"
+echo ""
+echo "Questions (2):"
+echo "  * Which category does the honeypot belong to?"
+echo "    [campus, cloud, residential]"
+read hp_cat
+
+echo "  * Which honeypot ID did you get assigned?"
+echo "    [number >= 0]"
+read hp_id
+
+echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
+echo "HP_ID=${hp_id}" >> ${DOTENV}
 
 
 # --- Setup SSH honeypot -------------------------------------------
@@ -151,21 +183,46 @@ echo ""
 
 echo "Setup logrotate:"
 
-echo "  * "
-echo "  * "
-echo "  * "
+echo "  * Backup configuration"
+cp ${CONFIG_LOG} ${CONFIG_LOG}.bak
+
+echo "  * Download configuration file"
+curl -o ${CONFIG_LOG} ${URL_LOG}
 
 echo "Successfully setup logrotate"
 echo ""
 
 
+# --- Setup SSH Keys -----------------------------------------------
+
+echo "Setup SSH key:"
+
+echo "  * Generate Key"
+ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
+
+
 # --- Setup Cronjobs -----------------------------------------------
 
+echo "Successfully generated Cron jobs"
+echo ""
 
+# --- Postwork -----------------------------------------------------
 
-# --- Cleanup ------------------------------------------------------
+# storing SSH_KEY in config
+echo "HP_SSH_KEY=${SSH_KEY}" >> ${DOTENV}
 
+echo "Honeypot setup is complete."
+echo "Please share your public key information immediately with:"
+echo "  Max Resing <m.resing-1@student.utwente.nl>"
+echo ""
+echo "Public Key:"
+echo $(cat ${SSH_KEY}.pub)
+echo ""
+echo "After sharing the key information, you need to reboot the honeypot."
+echo "Reboot now? [y/n]"
+read do_reboot
 
-
-
+if [[ ${do_reboot} == "y" ]] ; then
+  reboot
+fi
 
