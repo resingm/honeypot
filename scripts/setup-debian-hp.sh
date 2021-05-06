@@ -23,7 +23,9 @@ CONFIG_VNC=/etc/systemd/system/vncservice.service
 CONFIG_LOG=/etc/logrotate.conf
 VNC_SERVICE=vncservice.service
 
-DIR_TEL=/home/$SUDO_USER/ftelnetd
+URL_SSH=https://static.maxresing.de/pub/sshd_config
+URL_TEL=https://static.maxresing.de/pub/inetd.conf
+URL_VNC=https://static.maxresing.de/pub/vncservice
 
 
 # --- Option processing --------------------------------------------
@@ -99,45 +101,8 @@ apt-get -qq install openssh-server
 echo "  * Backup ${CONFIG_SSH}"
 cp ${CONFIG_SSH} ${CONFIG_SSH}.bak
 
-echo "  * Configure sshd"
-echo "" > ${CONFIG_SSH}
-echo "# ------------------------------------------------------------------" >> ${CONFIG_SSH}
-echo "# " >> ${CONFIG_SSH}
-echo "#   Configuration generated" >> ${CONFIG_SSH}
-echo "# " >> ${CONFIG_SSH}
-echo "#   In case of questions, contact Max Resing <m.resing-1@student.utwente.nl>" >> ${CONFIG_SSH}
-echo "# " >> ${CONFIG_SSH}
-echo "# ------------------------------------------------------------------" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "Include /etc/ssh/sshd_config.d/*.conf" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "# Listening" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "Port 22" >> ${CONFIG_SSH}
-echo "Address Family any" >> ${CONFIG_SSH}
-echo "ListenAddress 0.0.0.0" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "# Authentication" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "PermitRootLogin prohibit-password" >> ${CONFIG_SSH}
-echo "PubkeyAuthentication yes" >> ${CONFIG_SSH}
-echo "PasswordAuthentication yes" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "# Logging" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "SyslogFacility AUTH" >> ${CONFIG_SSH}
-echo "LogLevel INFO" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "# Misc" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-echo "ChallengeResponseAuthentication no" >> ${CONFIG_SSH}
-echo "UsePAM yes" >> ${CONFIG_SSH}
-echo "X11Forwarding yes" >> ${CONFIG_SSH}
-echo "PrintMotd no" >> ${CONFIG_SSH}
-echo "Accept Env LANG LC_*" >> ${CONFIG_SSH}
-echo "Subsystem   sftp    /usr/lib/openssh/sftp-server" >> ${CONFIG_SSH}
-echo "" >> ${CONFIG_SSH}
-
+echo "  * Download Configuration sshd_config"
+curl -o ${CONFIG_SSH} ${URL_SSH}
 
 echo "  * Enable sshd.service"
 systemctl enable sshd.service
@@ -155,22 +120,9 @@ apt-get -qq install inetutils-telnetd
 echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
 
-echo "  * Configure telnetd"
-echo "" > ${CONFIG_TEL}
+echo "  * Download inetd.conf"
+curl -o ${CONFIG_TEL} ${URL_TEL}
 
-echo "# ------------------------------------------------------------------" >> ${CONFIG_TEL}
-echo "# " >> ${CONFIG_TEL}
-echo "#   Configuration generated" >> ${CONFIG_TEL}
-echo "# " >> ${CONFIG_TEL}
-echo "#   In case of questions, contact Max Resing <m.resing-1@student.utwente.nl>" >> ${CONFIG_TEL}
-echo "# " >> ${CONFIG_TEL}
-echo "# " >> ${CONFIG_TEL}
-echo "# /etc/inetd.conf: see inetd(8) for further information" >> ${CONFIG_TEL}
-echo "# ------------------------------------------------------------------" >> ${CONFIG_TEL}
-echo "" >> ${CONFIG_TEL}
-echo "#:STANDARD: These are standard services" >> ${CONFIG_TEL}
-echo "telnet  stream  tcp nowait  root  /usr/sbin/tcpd  ${which telnetd}" >> ${CONFIG_TEL}
-echo "" >> ${CONFIG_TEL}
 
 echo "  * Enable inetd.service"
 systemctl enable inetd.service
@@ -183,26 +135,11 @@ echo ""
 
 echo "Setup VNC honeypot:"
 
-echo "  * Installing Xvnc"
+echo "  * Installing vncterm"
 apt-get -qq install linuxvnc
 
-echo "  * Setup systemd unit file"
-
-# Clear file if existing
-echo "" > ${CONFIG_VNC}
-
-echo "[Unit]" >> ${CONFIG_VNC}
-echo "Description=Remote desktop service (VNC)" >> ${CONFIG_VNC}
-echo "After=syslog.target network.target" >> ${CONFIG_VNC}
-echo "" >> ${CONFIG_VNC}
-echo "[Service]" >> ${CONFIG_VNC}
-echo "Type=simple" >> ${CONFIG_VNC}
-echo "" >> ${CONFIG_VNC}
-echo "ExecStart=${which linuxvnc} 5 -rfbport 5900 -listen 0.0.0.0" >> ${CONFIG_VNC}
-echo "" >> ${CONFIG_VNC}
-echo "[Install]" >> ${CONFIG_VNC}
-echo "WantedBy=multi-user.target" >> ${CONFIG_VNC}
-echo "" >> ${CONFIG_VNC}
+echo "  * Download unit file"
+curl -o ${CONFIG_VNC} ${URL_VNC}
 
 echo "  * Enable ${VNC_SERVICE}"
 systemctl enable ${VNC_SERVICE}
