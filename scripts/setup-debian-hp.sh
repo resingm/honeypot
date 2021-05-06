@@ -104,6 +104,26 @@ if [[ $(id -u) -ne 0 ]] ; then
   exit 1
 fi
 
+# --- Prerequisites ------------------------------------------------
+
+echo "This script automates the setup of a honeypot for some research"
+echo "at the University of Twente. Please answer the following request"
+echo "to start the script."
+echo "If you have any doubts, please cancel the execution with CTRL+C"
+echo "and contact m.resing-1@student.utwente.nl"
+echo ""
+echo "Questions (2):"
+echo "  * Which category does the honeypot belong to?"
+echo -n "    [campus, cloud, residential]: "
+read hp_cat
+
+echo "  * Which honeypot ID did you get assigned?"
+echo -n "    [number >= 0]: "
+read hp_id
+
+echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
+echo "HP_ID=${hp_id}" >> ${DOTENV}
+echo ""
 
 echo "Performing general setup tasks:"
 
@@ -112,33 +132,15 @@ mkdir -p ${DIRECTORY}
 
 echo "  * Create .env file"
 # Clean possibly existing .env from previous executions
-echo "" > ${DOTENT}
+echo "" > ${DOTENV}
 
 echo "  * Updating system"
 apt-get -qq update
 apt-get -qq dist-upgrade
 
-# echo "  * Installing curl"
-# apt-get -qq install curl
+echo "  * Installing curl"
+apt-get -qq install curl
 
-
-# --- Setup SSH honeypot -------------------------------------------
-
-echo "Requires user input"
-echo "If you have any doubts, please cancel the execution with CTRL+C"
-echo "and contact m.resing-1@student.utwente.nl"
-echo ""
-echo "Questions (2):"
-echo "  * Which category does the honeypot belong to?"
-echo "    [campus, cloud, residential]"
-read hp_cat
-
-echo "  * Which honeypot ID did you get assigned?"
-echo "    [number >= 0]"
-read hp_id
-
-echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
-echo "HP_ID=${hp_id}" >> ${DOTENV}
 
 
 # --- Setup SSH honeypot -------------------------------------------
@@ -150,7 +152,7 @@ echo "  * Backup ${CONFIG_SSH}"
 cp ${CONFIG_SSH} ${CONFIG_SSH}.bak
 
 echo "  * Download Configuration sshd_config"
-curl -o ${CONFIG_SSH} ${URL_SSH}
+curl -s -o ${CONFIG_SSH} ${URL_SSH}
 
 echo "  * Enable sshd.service"
 systemctl enable sshd.service
@@ -169,7 +171,7 @@ echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
 
 echo "  * Download inetd.conf"
-curl -o ${CONFIG_TEL} ${URL_TEL}
+curl -s -o ${CONFIG_TEL} ${URL_TEL}
 
 
 echo "  * Enable inetd.service"
@@ -187,7 +189,7 @@ echo "  * Installing vncterm"
 apt-get -qq install linuxvnc
 
 echo "  * Download unit file"
-curl -o ${CONFIG_VNC} ${URL_VNC}
+curl -s -o ${CONFIG_VNC} ${URL_VNC}
 
 echo "  * Enable ${VNC_SERVICE}"
 systemctl enable ${VNC_SERVICE}
@@ -203,7 +205,7 @@ echo "  * Backup configuration"
 cp ${CONFIG_LOG} ${CONFIG_LOG}.bak
 
 echo "  * Download configuration file"
-curl -o ${CONFIG_LOG} ${URL_LOG}
+curl -s -o ${CONFIG_LOG} ${URL_LOG}
 
 echo "Successfully setup logrotate"
 echo ""
@@ -219,7 +221,9 @@ ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
 
 # --- Setup Cronjobs -----------------------------------------------
 
-echo "Successfully generated Cron jobs"
+# TODO Add Cronjobs by downloading scripts and configuring them.
+
+# echo "Successfully generated Cron jobs"
 echo ""
 
 # --- Postwork -----------------------------------------------------
@@ -235,7 +239,7 @@ echo "Public Key:"
 echo $(cat ${SSH_KEY}.pub)
 echo ""
 echo "After sharing the key information, you need to reboot the honeypot."
-echo "Reboot now? [y/n]"
+echo -n "Reboot now? [y/n]: "
 read do_reboot
 
 if [[ ${do_reboot} == "y" ]] ; then
