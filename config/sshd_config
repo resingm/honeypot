@@ -1,0 +1,65 @@
+# ------------------------------------------------------------------
+#
+#   Configuration downloaded from static.maxresing.de
+#     https://static.maxresing.de/pub/sshd_config
+#
+#   In case of questions, contact the initiator of this configuration
+#   file
+#
+#     Max Resing <m.resing-1@student.utwente.nl>
+#
+# ------------------------------------------------------------------
+
+# Generally, sshd_config.d is included. This is disabled, since the
+# configuration could interfere with the honeypot configuration.
+# Include /etc/ssh/sshd_config.d/*.conf
+
+# General Configuration
+Port 22
+AddressFamily any
+ListenAddress 0.0.0.0
+
+
+# Authentication
+
+# This adjusts the SSH server to be generally secure. Root logins aren't
+# permitted, PubkeyAuthentication is enabled (which you should rather use over
+# convenctional user/password authentication
+
+PermitRootLogin prohibit-password
+PubkeyAuthentication yes
+PasswordAuthentication yes
+
+# Unfortunately, for this research we need to enable "PasswordAuthentication".
+# However, if this is too insecure for you, you could also just allow specific
+# users with the AllowUsers option. For multiple users seperate with a space
+
+# AllowUsers user1 user2
+
+
+# Logging
+
+# Configures the SSH to log to the auth syslog, on Debian based systems:
+#   /var/log/auth.log
+# Furthermore, LogLevel.INFO is sufficient, since it includes all attempted
+# logins. For the research, you could also change it to "DEBUG" or even higher,
+# but please do not change it to something lower than "INFO".
+
+SyslogFacility AUTH
+LogLevel INFO
+
+
+# Misc
+
+# Some miscellaneous configuration flags. Most settings are included in the
+# default SSH configuration of an OpenSSH server on Debian systems. Thus, I just
+# adapted them.
+# Feel free to enable Motd, if you want. I don't need it for a honeypot
+
+ChallengeResponseAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+
