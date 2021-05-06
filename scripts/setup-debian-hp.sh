@@ -231,6 +231,10 @@ echo ""
 # storing SSH_KEY in config
 echo "HP_SSH_KEY=${SSH_KEY}" >> ${DOTENV}
 
+# TODO: Add a reference to some README online which explains the
+#       setup and the risks in detail. Furthermore, it should
+#       inlcude the recommended options, like AllowUsers in sshd_config
+
 echo "Honeypot setup is complete."
 echo "Please share your public key information immediately with:"
 echo "  Max Resing <m.resing-1@student.utwente.nl>"
