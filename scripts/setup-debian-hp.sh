@@ -18,8 +18,10 @@ USAGE="Usage: $0 [-vh]"
 
 # Constants
 CONFIG_SSH=/etc/ssh/sshd_config
-CONFIG_TEL=/etc/telnet/config
-CONFIG_VNC=/etc/tigervnc/config
+CONFIG_TEL=/etc/inetd.conf
+CONFIG_VNC=/etc/systemd/system/vncservice.service
+CONFIG_LOG=/etc/logrotate.conf
+VNC_SERVICE=vncservice.service
 
 DIR_TEL=/home/$SUDO_USER/ftelnetd
 
@@ -140,6 +142,9 @@ echo "" >> ${CONFIG_SSH}
 echo "  * Enable sshd.service"
 systemctl enable sshd.service
 
+echo "Successfully set up SSH honeypot"
+echo ""
+
 
 # --- Setup telnet honeypot ----------------------------------------
 echo "Setup Telnet honeypot:"
@@ -147,27 +152,74 @@ echo "Setup Telnet honeypot:"
 echo "  * Installing telnet server (telnetd)"
 apt-get -qq install inetutils-telnetd
 
-# echo "  * Backup ${CONFIG_TEL}"
-# cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
+echo "  * Backup ${CONFIG_TEL}"
+cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
 
-# echo "  * Configure telnetd"
-# TODO: Configure telnetd
+echo "  * Configure telnetd"
+echo "" > ${CONFIG_TEL}
 
-# echo "  * Enable sshd.service"
-# systemctl enable inetd.service
+echo "# ------------------------------------------------------------------" >> ${CONFIG_TEL}
+echo "# " >> ${CONFIG_TEL}
+echo "#   Configuration generated" >> ${CONFIG_TEL}
+echo "# " >> ${CONFIG_TEL}
+echo "#   In case of questions, contact Max Resing <m.resing-1@student.utwente.nl>" >> ${CONFIG_TEL}
+echo "# " >> ${CONFIG_TEL}
+echo "# " >> ${CONFIG_TEL}
+echo "# /etc/inetd.conf: see inetd(8) for further information" >> ${CONFIG_TEL}
+echo "# ------------------------------------------------------------------" >> ${CONFIG_TEL}
+echo "" >> ${CONFIG_TEL}
+echo "#:STANDARD: These are standard services" >> ${CONFIG_TEL}
+echo "telnet  stream  tcp nowait  root  /usr/sbin/tcpd  ${which telnetd}" >> ${CONFIG_TEL}
+echo "" >> ${CONFIG_TEL}
 
+echo "  * Enable inetd.service"
+systemctl enable inetd.service
+
+echo "Successfully set up Telnet honeypot"
 echo ""
+
 
 # --- Setup VNC honeypot -------------------------------------------
 
-echo "Setup VNC honeypot"
+echo "Setup VNC honeypot:"
 
-echo "  * Installing TightVNC"
-apt-get -qq install tightvncserver
+echo "  * Installing Xvnc"
+apt-get -qq install linuxvnc
 
+echo "  * Setup systemd unit file"
+
+# Clear file if existing
+echo "" > ${CONFIG_VNC}
+
+echo "[Unit]" >> ${CONFIG_VNC}
+echo "Description=Remote desktop service (VNC)" >> ${CONFIG_VNC}
+echo "After=syslog.target network.target" >> ${CONFIG_VNC}
+echo "" >> ${CONFIG_VNC}
+echo "[Service]" >> ${CONFIG_VNC}
+echo "Type=simple" >> ${CONFIG_VNC}
+echo "" >> ${CONFIG_VNC}
+echo "ExecStart=${which linuxvnc} 5 -rfbport 5900 -listen 0.0.0.0" >> ${CONFIG_VNC}
+echo "" >> ${CONFIG_VNC}
+echo "[Install]" >> ${CONFIG_VNC}
+echo "WantedBy=multi-user.target" >> ${CONFIG_VNC}
+echo "" >> ${CONFIG_VNC}
+
+echo "  * Enable ${VNC_SERVICE}"
+systemctl enable ${VNC_SERVICE}
+
+echo "Successfully setup VNC honeypot"
 echo ""
 
 # --- Setup Logrotation --------------------------------------------
+
+echo "Setup logrotate:"
+
+echo "  * "
+echo "  * "
+echo "  * "
+
+echo "Successfully setup logrotate"
+echo ""
 
 
 # --- Setup Cronjobs -----------------------------------------------
