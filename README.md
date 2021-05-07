@@ -30,3 +30,8 @@ which identifies the honeypot which has logged the record. `timestamp` is the
 moment the honeypot logged the record. In case of the dataplane data, it is the
 `last_seen` field.
 
+
+## Honeypots
+
+Check `config/README.md` for details regarding the honeypots.
+
