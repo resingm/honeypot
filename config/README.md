@@ -63,7 +63,7 @@ or `residential`.
 
 The setup script will download and replace existing configuration files. Before
 doing so, the configuration files are backed up and will be restored with the
-help of the `remove-hp.sh` script.
+help of the `remove-debian-hp.sh` script.
 
 
 ## Security Essentials
@@ -191,7 +191,7 @@ provide. I do not need your entire syslogs and I do not want them. I am already
 happy that you volunteer to participate in the research.
 
 The scripts which are executed are stored in `/usr/local/bin`. The scripts will
-be removed by the `remove-hp.sh` script.
+be removed by the `remove-debian-hp.sh` script.
 
 
 ### Summary
@@ -221,4 +221,16 @@ Furthermore, the following scripts configured as cron jobs will be stored in
 ```
 # TODO: Fill in scripts
 ```
+
+Those are the scripts you need to download:
+
+ * [setup-debian-hp.sh](https://static.maxresing.de/pub/setup-debian-hp.sh)
+ * [remove-debian-hp.sh](https://static.maxresing.de/pub/setup-debian-hp.sh)
+
+The configuration files can be found here:
+
+ * [/etc/inetd.conf](https://static.maxresing.de/pub/inetd.conf)
+ * [/etc/logrotate.conf](https://static.maxresing.de/pub/logrotate.conf)
+ * [/etc/ssh/sshd_config](https://static.maxresing.de/pub/sshd_config)
+ * [/etc/systemd/system/vncservice.service](https://static.maxresing.de/pub/vncservice)
 
