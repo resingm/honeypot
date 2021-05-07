@@ -96,6 +96,9 @@ touch $LOCK
 
 
 # --- Script -------------------------------------------------------
+echo "================================================================"
+echo "  Automated Setup Script for Honeypots"
+echo "================================================================"
 
 # Check if script runs with super user permissions
 if [[ $(id -u) -ne 0 ]] ; then
@@ -188,6 +191,9 @@ echo "Setup VNC honeypot:"
 echo "  * Installing vncterm"
 apt-get -qq install linuxvnc
 
+echo "  * Installing openssl (secure password generation)"
+apt-get -qq install openssl
+
 echo "  * Download unit file"
 curl -s -o ${CONFIG_VNC} ${URL_VNC}
 
@@ -222,6 +228,9 @@ ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
 # --- Setup Cronjobs -----------------------------------------------
 
 # TODO Add Cronjobs by downloading scripts and configuring them.
+
+# TODO: Save scripts at /usr/local/bin
+
 
 # echo "Successfully generated Cron jobs"
 echo ""
