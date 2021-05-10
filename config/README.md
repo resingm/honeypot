@@ -183,15 +183,17 @@ somehow lost.
 
 ### Cron Jobs
 
-The honeypot will configure a few cron jobs, which will run each night. When the
-logrotation has created a new log file, the job will extract those log entries
-which are also required for this research. Therefore, you can be sure, that any
-system activity will not be transmitted. Consider it a layer of privacy which I
-provide. I do not need your entire syslogs and I do not want them. I am already
-happy that you volunteer to participate in the research.
+The setup script configures one cron job, which will run each night at 2am. The
+cron job executes the script [upload-logs.sh](https://static.maxresing.de/pub/ut/upload-logs.sh).
+The log rotation should be done by that moment. The script of the cron job
+essentially greps all log entries from `/var/log/auth.log.1` and
+`/var/log/syslog.1` which belong to one of the applications `sshd`, `telnetd` or
+`linuxvnc`.
 
-The scripts which are executed are stored in `/usr/local/bin`. The scripts will
-be removed by the `remove-debian-hp.sh` script.
+This research does not require any other log data and thus, does not transmit
+it. The script of the cron job is stored in `/usr/local/bin`.
+The `remove-debian-hp.sh` cleanup the cron job file `/etc/cron.d/honeypot` as
+well as the `upload-logs.sh` script.
 
 
 ### Summary

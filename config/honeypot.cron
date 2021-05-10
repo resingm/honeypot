@@ -1,0 +1,15 @@
+# ------------------------------------------------------------------
+#
+#   Configuration downloaded from static.maxresing.de
+#     https://static.maxresing.de/pub/ut/honeypot.cron
+#
+#   In case of questions, contact the initiator of this configuration
+#   file
+#
+#     Max Resing <m.resing-1@student.utwente.nl>
+#
+# ------------------------------------------------------------------
+
+# Upload logs each night at 2 am. Repeat each day, each month.
+0 2 * * * root command upload-logs.sh
+

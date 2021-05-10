@@ -42,10 +42,15 @@ CONFIG_TEL=/etc/inetd.conf
 CONFIG_VNC=/etc/systemd/system/vncservice.service
 CONFIG_LOG=/etc/logrotate.conf
 
-URL_SSH=https://static.maxresing.de/pub/sshd_config
-URL_TEL=https://static.maxresing.de/pub/inetd.conf
-URL_VNC=https://static.maxresing.de/pub/vncservice
-URL_LOG=https://static.maxresing.de/pub/logrotate.conf
+CRON_SCRIPT=/usr/local/bin/upload-logs.sh
+CRON_JOB=/etc/cron.d/honeypot
+
+URL_SSH=https://static.maxresing.de/pub/ut/sshd_config
+URL_TEL=https://static.maxresing.de/pub/ut/inetd.conf
+URL_VNC=https://static.maxresing.de/pub/ut/vncservice
+URL_LOG=https://static.maxresing.de/pub/ut/logrotate.conf
+URL_CRON_SCRIPT=https://static.maxresing.de/pub/ut/upload-logs.sh
+URL_CRON_CONFIG=https://static.maxresing.de/pub/ut/honeypot.cron
 
 SSH_KEY=/home/${SUDO_USER}/.ssh/id_honeypot
 
@@ -124,10 +129,7 @@ echo "  * Which honeypot ID did you get assigned?"
 echo -n "    [number >= 0]: "
 read hp_id
 
-echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
-echo "HP_ID=${hp_id}" >> ${DOTENV}
 echo ""
-
 echo "Performing general setup tasks:"
 
 echo "  * Create honeypot directory"
@@ -136,10 +138,14 @@ mkdir -p ${DIRECTORY}
 echo "  * Create .env file"
 # Clean possibly existing .env from previous executions
 echo "" > ${DOTENV}
+echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
+echo "HP_ID=${hp_id}" >> ${DOTENV}
+echo ""
+
 
 echo "  * Updating system"
 apt-get -qq update
-apt-get -qq dist-upgrade
+apt-get -qq upgrade
 
 echo "  * Installing curl"
 apt-get -qq install curl
@@ -224,6 +230,8 @@ echo "Setup SSH key:"
 echo "  * Generate Key"
 ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
 
+echo "Successfully generated SSH key"
+echo ""
 
 # --- Setup Cronjobs -----------------------------------------------
 
@@ -231,8 +239,19 @@ ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
 
 # TODO: Save scripts at /usr/local/bin
 
+echo "Setup CRON Job:"
 
-# echo "Successfully generated Cron jobs"
+echo "  * Download script"
+curl -o ${CRON_SCRIPT} ${URL_CRON_SCRIPT}
+
+echo "  * Add executable permissions"
+chmod +x ${CRON_SCRIPT}
+
+echo "  * Configure cron job"
+curl -o ${CRON_JOB} ${URL_CRON_CONFIG}
+
+
+echo "Successfully generated"
 echo ""
 
 # --- Postwork -----------------------------------------------------
@@ -240,11 +259,17 @@ echo ""
 # storing SSH_KEY in config
 echo "HP_SSH_KEY=${SSH_KEY}" >> ${DOTENV}
 
+
 # TODO: Add a reference to some README online which explains the
 #       setup and the risks in detail. Furthermore, it should
 #       inlcude the recommended options, like AllowUsers in sshd_config
 
 echo "Honeypot setup is complete."
+echo ""
+echo "If you have any questions left regarding the running software or the"
+echo "configuration, please check the README first:"
+echo "  https://static.maxresing.de/pub/ut/README.txt"
+echo ""
 echo "Please share your public key information immediately with:"
 echo "  Max Resing <m.resing-1@student.utwente.nl>"
 echo ""
