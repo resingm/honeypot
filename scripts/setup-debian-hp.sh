@@ -140,7 +140,6 @@ echo "  * Create .env file"
 echo "" > ${DOTENV}
 echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
 echo "HP_ID=${hp_id}" >> ${DOTENV}
-echo ""
 
 
 echo "  * Updating system"
@@ -150,6 +149,7 @@ apt-get -qq upgrade
 echo "  * Installing curl"
 apt-get -qq install curl
 
+echo ""
 
 
 # --- Setup SSH honeypot -------------------------------------------
@@ -202,6 +202,7 @@ apt-get -qq install openssl
 
 echo "  * Download unit file"
 curl -s -o ${CONFIG_VNC} ${URL_VNC}
+chmod 755 ${CONFIG_VNC}
 
 echo "  * Enable ${VNC_SERVICE}"
 systemctl enable ${VNC_SERVICE}
@@ -235,20 +236,16 @@ echo ""
 
 # --- Setup Cronjobs -----------------------------------------------
 
-# TODO Add Cronjobs by downloading scripts and configuring them.
-
-# TODO: Save scripts at /usr/local/bin
-
 echo "Setup CRON Job:"
 
 echo "  * Download script"
-curl -o ${CRON_SCRIPT} ${URL_CRON_SCRIPT}
+curl -s -o ${CRON_SCRIPT} ${URL_CRON_SCRIPT}
 
 echo "  * Add executable permissions"
 chmod +x ${CRON_SCRIPT}
 
 echo "  * Configure cron job"
-curl -o ${CRON_JOB} ${URL_CRON_CONFIG}
+curl -s -o ${CRON_JOB} ${URL_CRON_CONFIG}
 
 
 echo "Successfully generated"
