@@ -233,6 +233,12 @@ echo "Setup SSH key:"
 echo "  * Generate Key"
 ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
 
+echo "  * Update permission of SSH key"
+chmod 600 ${SSH_KEY}
+chmod 644 ${SSH_KEY}.pub
+chown ${SUDO_USER}:${SUDO_USER} ${SSH_KEY}
+chown ${SUDO_USER}:${SUDO_USER} ${SSH_KEY}.pub
+
 echo "Successfully generated SSH key"
 echo ""
 
