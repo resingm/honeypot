@@ -145,8 +145,8 @@ echo "HP_ID=${hp_id}" >> ${DOTENV}
 
 
 echo "  * Updating system"
-apt-get -qq update
-apt-get -qq upgrade
+apt-get -qq update > /dev/null
+apt-get -qq upgrade > /dev/null
 
 echo "  * Installing curl"
 apt-get -qq install curl
