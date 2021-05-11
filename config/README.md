@@ -120,7 +120,8 @@ of common usernames and passwords. Therefore, it is essential to have a strong
 password.
 
 The default telnet port is 23. The installed Debian package is
-`inetutils-telnetd`. The inetd server logs to `/var/log/syslog`.
+`inetutils-telnetd`. `openbsd-inetd` is running as the internet super-server.
+The inetd server logs to `/var/log/syslog`.
 
 
 ### VNC
