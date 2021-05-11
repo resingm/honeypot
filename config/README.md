@@ -10,8 +10,8 @@ on the software which is used. All honeypots are so-called low-interaction
 honeypots. A low-interaction honeypot gives the attacker very little attacking
 surface, which makes them a secure choice to operate. Low-interaction means, the
 honeypot will provide an endpoint but does not allow the attacker to gain access
-to the system. This kind of honeypot is suitable for this research, since we
-just need to log the requesting IP addresses. We are not interested in any other
+to the system. This kind of honeypot is suitable for this research, since I
+just need to log the requesting IP addresses. I am not interested in any other
 kind of information.
 
 
@@ -112,7 +112,7 @@ still maintained and well tested. `telnetd` runs on top of the `inetd` daemon.
 The package includes a systemd unit file, which is enabled during the setup.
 
 Telnet transmits the username and password in plaintext over the network. This
-makes it an insecure option per se. We recommend it to not use it, even if it is
+makes it an insecure option per se. I recommend it to not use it, even if it is
 just in your home network.
 
 Scanners/Attackers will try to login to the Telnet server by trying combinations
@@ -129,8 +129,8 @@ The chosen VNC server for this research is `vncterm`. Since most honeypots will
 operate on systems without an X server, the options were limited. `vncterm` is
 a VNC server build on top of the [libvncserver](http://libvnc.github.io/) lib.
 The server will serve one TTY session via VNC on port 5900. The package does not
-include a systemd unit file, thus we provide a
-[unit file](https://static.maxresing.de/pub/vncservice) ourselves.
+include a systemd unit file, thus I provide a
+[unit file](https://static.maxresing.de/pub/vncservice) myself.
 
 VNC provides an authentication mechanism by design. This means, it does not rely
 on the regular authentication which Linux has implemented. By default `vncterm`
@@ -148,7 +148,7 @@ If you are still paranoid, change the password just as you want in the unit file
 /etc/systemd/system/vncservice.service
 ```
 
-We do not need access to the VNC service, thus we chose a random password.
+I do not need access to the VNC service, thus I chose a random password.
 
 Scanners/Attackers will try to login to the VNC server by trying common
 passwords. Therefore, the random password with a complexity of 256 bytes is a
