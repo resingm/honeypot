@@ -177,7 +177,7 @@ echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
 apt-get -qq install openbsd-inetd > /dev/null
-apt-get -qq install telnetd > /dev/null
+apt-get -qq install inetutils-telnetd > /dev/null
 
 echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
