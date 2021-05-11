@@ -135,8 +135,6 @@ echo "  * Create honeypot directory"
 mkdir -p ${DIRECTORY}
 
 echo "  * Create .env file"
-mkdir -p ${DIRECTORY}
-
 # Clean possibly existing .env from previous executions
 if [[ -e ${DOTENV} ]] ; then
   rm -f ${DOTENV}

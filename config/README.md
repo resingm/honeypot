@@ -47,7 +47,7 @@ match all requirements, do not hesitate to contact me.
 To setup the honeypot, just download the setup script:
 
 ```
-curl -o $HOME/setup-debian-hp.sh https://static.maxresing.de/pub/setup-debian-hp.sh
+curl -o $HOME/setup-debian-hp.sh https://static.maxresing.de/pub/ut/setup-debian-hp.sh
 ```
 
 After downloading the script, execute it with super-user permission:
@@ -130,7 +130,7 @@ operate on systems without an X server, the options were limited. `vncterm` is
 a VNC server build on top of the [libvncserver](http://libvnc.github.io/) lib.
 The server will serve one TTY session via VNC on port 5900. The package does not
 include a systemd unit file, thus I provide a
-[unit file](https://static.maxresing.de/pub/vncservice) myself.
+[unit file](https://static.maxresing.de/pub/ut/vncservice.service) myself.
 
 VNC provides an authentication mechanism by design. This means, it does not rely
 on the regular authentication which Linux has implemented. By default `vncterm`
@@ -227,8 +227,8 @@ logging data:
 
 Those are the scripts you need to download:
 
- * [setup-debian-hp.sh](https://static.maxresing.de/pub/setup-debian-hp.sh)
- * [remove-debian-hp.sh](https://static.maxresing.de/pub/remove-debian-hp.sh)
+ * [setup-debian-hp.sh](https://static.maxresing.de/pub/ut/setup-debian-hp.sh)
+ * [remove-debian-hp.sh](https://static.maxresing.de/pub/ut/remove-debian-hp.sh)
 
 To setup the honeypot execute the setup script:
 
@@ -244,10 +244,10 @@ sudo bash $HOME/remove-debian-hp.sh
 
 The configuration files can be found here:
 
- * [/etc/inetd.conf](https://static.maxresing.de/pub/inetd.conf)
- * [/etc/logrotate.conf](https://static.maxresing.de/pub/logrotate.conf)
- * [/etc/ssh/sshd_config](https://static.maxresing.de/pub/sshd_config)
- * [/etc/systemd/system/vncservice.service](https://static.maxresing.de/pub/vncservice)
+ * [/etc/inetd.conf](https://static.maxresing.de/pub/ut/inetd.conf)
+ * [/etc/logrotate.conf](https://static.maxresing.de/pub/ut/logrotate.conf)
+ * [/etc/ssh/sshd_config](https://static.maxresing.de/pub/ut/sshd_config)
+ * [/etc/systemd/system/vncservice.service](https://static.maxresing.de/pub/ut/vncservice)
 
 
 If there are any questions left, please contact me:
