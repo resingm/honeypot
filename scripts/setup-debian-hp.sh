@@ -149,7 +149,7 @@ apt-get -qq update > /dev/null
 apt-get -qq upgrade > /dev/null
 
 echo "  * Installing curl"
-apt-get -qq install curl
+apt-get -qq install curl > /dev/null
 
 echo ""
 
@@ -157,7 +157,7 @@ echo ""
 # --- Setup SSH honeypot -------------------------------------------
 echo "Setup SSH honeypot:"
 echo "  * Installing SSH server (openssh-server)"
-apt-get -qq install openssh-server
+apt-get -qq install openssh-server > /dev/null
 
 echo "  * Backup ${CONFIG_SSH}"
 cp ${CONFIG_SSH} ${CONFIG_SSH}.bak
@@ -176,7 +176,7 @@ echo ""
 echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
-apt-get -qq install inetutils-telnetd
+apt-get -qq install inetutils-telnetd > /dev/null
 
 echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
@@ -197,10 +197,10 @@ echo ""
 echo "Setup VNC honeypot:"
 
 echo "  * Installing vncterm"
-apt-get -qq install linuxvnc
+apt-get -qq install linuxvnc > /dev/null
 
 echo "  * Installing openssl (secure password generation)"
-apt-get -qq install openssl
+apt-get -qq install openssl > /dev/null
 
 echo "  * Download unit file"
 curl -s -o ${CONFIG_VNC} ${URL_VNC}
