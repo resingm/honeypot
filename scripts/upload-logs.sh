@@ -49,7 +49,7 @@ source ${DOTENV}
 
 # Create directory and file
 mkdir -p ${LOG_DIR}
-touch ${LOG_DIR}/${LOG_OUT}
+touch ${LOG_OUT}
 
 # Extract SSH logs
 cat ${LOG_SSH} | grep "sshd" >> ${LOG_OUT}
@@ -64,7 +64,7 @@ cat ${LOG_VNC} | grep "linuxvnc" >> ${LOG_OUT}
 # --- Transmit logs ------------------------------------------------
 
 # Create remote directory
-ssh -i ${HP_SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}"
+ssh -o "StrictHostKeyChecking no" -i ${HP_SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}"
 # Upload log file
-scp -i ${HP_SSH_KEY} ${LOG_OUT} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}/
+scp -o "StrictHostKeyChecking no" -i ${HP_SSH_KEY} ${LOG_OUT} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}/
 
