@@ -231,7 +231,7 @@ echo ""
 echo "Setup SSH key:"
 
 echo "  * Generate Key"
-ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N ""
+ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N "" -C "hp-${hp_cat}-${hp_id}"
 
 echo "  * Update permission of SSH key"
 chmod 600 ${SSH_KEY}
