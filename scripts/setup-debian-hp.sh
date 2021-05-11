@@ -135,6 +135,8 @@ echo "  * Create honeypot directory"
 mkdir -p ${DIRECTORY}
 
 echo "  * Create .env file"
+mkdir -p ${DIRECTORY}
+
 # Clean possibly existing .env from previous executions
 if [[ -e ${DOTENV} ]] ; then
   rm -f ${DOTENV}
@@ -166,7 +168,7 @@ echo "  * Download Configuration sshd_config"
 curl -s -o ${CONFIG_SSH} ${URL_SSH}
 
 echo "  * Enable sshd.service"
-systemctl enable sshd.service
+systemctl  enable sshd.service -q
 
 echo "Successfully set up SSH honeypot"
 echo ""
@@ -176,7 +178,7 @@ echo ""
 echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
-apt-get -qq install inetutils-telnetd > /dev/null
+apt-get -qq install telnetd > /dev/null
 
 echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
@@ -186,7 +188,7 @@ curl -s -o ${CONFIG_TEL} ${URL_TEL}
 
 
 echo "  * Enable inetd.service"
-systemctl enable inetd.service
+systemctl enable inetd.service -q
 
 echo "Successfully set up Telnet honeypot"
 echo ""
@@ -207,7 +209,7 @@ curl -s -o ${CONFIG_VNC} ${URL_VNC}
 chmod 755 ${CONFIG_VNC}
 
 echo "  * Enable ${VNC_SERVICE}"
-systemctl enable ${VNC_SERVICE}
+systemctl enable ${VNC_SERVICE} -q
 
 echo "Successfully setup VNC honeypot"
 echo ""
@@ -221,6 +223,9 @@ cp ${CONFIG_LOG} ${CONFIG_LOG}.bak
 
 echo "  * Download configuration file"
 curl -s -o ${CONFIG_LOG} ${URL_LOG}
+
+echo "  * Enable logrotate.service"
+systemctl enable logrotate.service -q
 
 echo "Successfully setup logrotate"
 echo ""
