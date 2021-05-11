@@ -166,7 +166,7 @@ echo "  * Download Configuration sshd_config"
 curl -s -o ${CONFIG_SSH} ${URL_SSH}
 
 echo "  * Enable sshd.service"
-systemctl  enable sshd.service -q
+systemctl enable sshd.service -q
 
 echo "Successfully set up SSH honeypot"
 echo ""
@@ -176,7 +176,6 @@ echo ""
 echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
-apt-get -qq install telnetd > /dev/null
 apt-get -qq install inetutils-telnetd > /dev/null
 
 echo "  * Backup ${CONFIG_TEL}"
