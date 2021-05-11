@@ -23,7 +23,9 @@ fi
 trap "rm -f $LOCK" EXIT
 touch $LOCK
 
-# --- Extract logs -------------------------------------------------
+
+# constants
+DOTENV=/etc/honeypot/.env
 
 LOG_SSH=/var/log/auth.log.1
 LOG_TELNET=/var/log/syslog.1
@@ -33,7 +35,16 @@ LOG_DIR=/var/log/honeypot
 LOG_OUT=${LOG_DIR}/$(date +"%Y_%m_%d_%H_%M_%S").log
 
 REMOTE_USER=honey
+REMOTE_HOST=max.dnsjedi.org
 REMOTE_DIR=/mnt/data/logs
+
+
+# --- Load environment ---------------------------------------------
+
+source ${DOTENV}
+
+# --- Extract logs -------------------------------------------------
+
 
 
 # Create directory and file
@@ -52,5 +63,8 @@ cat ${LOG_VNC} | grep "linuxvnc" >> ${LOG_OUT}
 
 # --- Transmit logs ------------------------------------------------
 
-scp ${LOG_OUT} ${REMOTE_USER}@${REMOTE_DIR}
+# Create remote directory
+ssh -i ${HP_SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p ${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}"
+# Upload log file
+scp -i ${HP_SSH_KEY} ${LOG_OUT} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/${HP_CATEGORY}/${HP_ID}/
 

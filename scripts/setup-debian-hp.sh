@@ -27,7 +27,6 @@
 SEMAPHORE=honeypotsetup
 VERSION=0.1.0
 
-# TODO: Add usage
 USAGE="Usage: $0 [-vh]"
 
 # Flags
@@ -47,7 +46,7 @@ CRON_JOB=/etc/cron.d/honeypot
 
 URL_SSH=https://static.maxresing.de/pub/ut/sshd_config
 URL_TEL=https://static.maxresing.de/pub/ut/inetd.conf
-URL_VNC=https://static.maxresing.de/pub/ut/vncservice
+URL_VNC=https://static.maxresing.de/pub/ut/vncservice.service
 URL_LOG=https://static.maxresing.de/pub/ut/logrotate.conf
 URL_CRON_SCRIPT=https://static.maxresing.de/pub/ut/upload-logs.sh
 URL_CRON_CONFIG=https://static.maxresing.de/pub/ut/honeypot.cron
@@ -137,8 +136,11 @@ mkdir -p ${DIRECTORY}
 
 echo "  * Create .env file"
 # Clean possibly existing .env from previous executions
-echo "" > ${DOTENV}
-echo "HP_CATEGORY=${hp_cat}" >> ${DOTENV}
+if [[ -e ${DOTENV} ]] ; then
+  rm -f ${DOTENV}
+fi;
+
+echo "HP_CATEGORY=${hp_cat}" > ${DOTENV}
 echo "HP_ID=${hp_id}" >> ${DOTENV}
 
 
@@ -248,18 +250,13 @@ echo "  * Configure cron job"
 curl -s -o ${CRON_JOB} ${URL_CRON_CONFIG}
 
 
-echo "Successfully generated"
+echo "Successfully configured cron job"
 echo ""
 
 # --- Postwork -----------------------------------------------------
 
 # storing SSH_KEY in config
 echo "HP_SSH_KEY=${SSH_KEY}" >> ${DOTENV}
-
-
-# TODO: Add a reference to some README online which explains the
-#       setup and the risks in detail. Furthermore, it should
-#       inlcude the recommended options, like AllowUsers in sshd_config
 
 echo "Honeypot setup is complete."
 echo ""
