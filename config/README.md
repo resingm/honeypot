@@ -5,8 +5,8 @@ requires me to operate a bunch of honeypots in different environments, e.g.
 residential areas, cloud environments or campus networks. First of all, thank
 you for your participation!
 
-This document aims to explain you what happens on your device/VM and elaborates
-on the software which is used. All honeypots are so-called low-interaction
+This document aims to explain what happens on your device/VM and elaborates on
+the software which is used. All honeypots are so-called low-interaction
 honeypots. A low-interaction honeypot gives the attacker very little attacking
 surface, which makes them a secure choice to operate. Low-interaction means, the
 honeypot will provide an endpoint but does not allow the attacker to gain access
@@ -44,7 +44,7 @@ match all requirements, do not hesitate to contact me.
 
 ## Setup
 
-To setup the honeypot, just download the setup script from my resources:
+To setup the honeypot, just download the setup script:
 
 ```
 curl -o $HOME/setup-debian-hp.sh https://static.maxresing.de/pub/setup-debian-hp.sh
@@ -74,7 +74,7 @@ This is just an overview of the steps you definitely need to follow:
  * Do NOT use default credentials for your system ; Chose a secure password!
  * SSH will operate on the default port 22
  * Do NOT use Telnet to login ; Telnet transmits passwords in plain text
- * Optionally: Increase security of SSH server to just allow specific users
+ * Optionally: Increase security of your SSH server to just allow specific users
 
 
 ## Software
@@ -96,7 +96,7 @@ enabled during the setup.
 SSH is one of the most common services to login to a machine remotely. It was
 designed with the intent to replace the insecure telnet protocol.
 
-Scanners/Attackers will try to login to the SSH server by trying combinations of
+Scanners/attackers will try to login to the SSH server by trying combinations of
 common usernames and passwords. Therefore, it is essential to have a strong
 password.
 
@@ -138,23 +138,25 @@ does not require a password. Since this is more than insecure, when exposing it
 to the internet, the systemd file is setup such that it generates a strong and
 random password on the startup of the service.
 
-The password has a length of 256
-bytes (base64 encoded) and should not bear a risk.
-
-brute-force attack need "51 duovigintillion ducentillion years" to crack it.
-If you are still paranoid, change the password just as you want in the unit file:
+The password has a length of 256 bytes (base64 encoded). A password of this
+length should be complex enough. According to
+[howsecureismypassword.net](https://howsecureismypassword.net/), a brute-force
+attack would require "51 duovigintillion ducentillion years" to crack it.
+If you are still paranoid, change the password just as you want in the unit
+file:
 
 ```
 /etc/systemd/system/vncservice.service
 ```
 
-I do not need access to the VNC service, thus I chose a random password.
+The random password is chosen, because there is no need for me to access the VNC
+service.
 
 Scanners/Attackers will try to login to the VNC server by trying common
 passwords. Therefore, the random password with a complexity of 256 bytes is a
 secure choice. According to [howsecureismypassword.net](https://howsecureismypassword.net/),
 would a brute-force attack require "51 duovigintillion ducentillion years to
-crack your password". I am pretty sure your honeypot will be offline earlier.
+crack your password". I am pretty sure my research will have finished by then.
 
 The default VNC port is 5900. The installed debian package is `linuxvnc`. The
 VNC server logs to `/var/log/syslog`.
@@ -206,7 +208,6 @@ inetutils-telnetd
 linuxvnc
 openssh-server
 openssl
-
 ```
 
 The system will serve the following services on the corresponding default ports
@@ -217,17 +218,29 @@ The system will serve the following services on the corresponding default ports
 5900 - vncservice.service (linuxvnc)
 ```
 
-Furthermore, the following scripts configured as cron jobs will be stored in
-`/usr/local/bin`
+Furthermore, the following script is configured as a cron job to transmit the
+logging data:
 
 ```
-# TODO: Fill in scripts
+/usr/bin/
 ```
 
 Those are the scripts you need to download:
 
  * [setup-debian-hp.sh](https://static.maxresing.de/pub/setup-debian-hp.sh)
- * [remove-debian-hp.sh](https://static.maxresing.de/pub/setup-debian-hp.sh)
+ * [remove-debian-hp.sh](https://static.maxresing.de/pub/remove-debian-hp.sh)
+
+To setup the honeypot execute the setup script:
+
+```
+sudo bash $HOME/setup-debian-hp.sh
+```
+
+At the end of the research, you can revert the changesL
+
+```
+sudo bash $HOME/remove-debian-hp.sh
+```
 
 The configuration files can be found here:
 
@@ -236,3 +249,8 @@ The configuration files can be found here:
  * [/etc/ssh/sshd_config](https://static.maxresing.de/pub/sshd_config)
  * [/etc/systemd/system/vncservice.service](https://static.maxresing.de/pub/vncservice)
 
+
+If there are any questions left, please contact me:
+  Max Resing <m.resing-1@student.utwente.nl>
+
+Thank you!
