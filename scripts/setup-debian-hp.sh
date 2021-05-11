@@ -177,6 +177,7 @@ echo "Setup Telnet honeypot:"
 
 echo "  * Installing telnet server (telnetd)"
 apt-get -qq install telnetd > /dev/null
+apt-get -qq install inetutils-telnetd > /dev/null
 
 echo "  * Backup ${CONFIG_TEL}"
 cp ${CONFIG_TEL} ${CONFIG_TEL}.bak
@@ -232,6 +233,11 @@ echo ""
 # --- Setup SSH Keys -----------------------------------------------
 
 echo "Setup SSH key:"
+
+echo "  * Configure ~/.ssh folder"
+mkdir -p /home/${SUDO_USER}/.ssh
+chmod 700 /home/${SUDO_USER}/.ssh
+chown ${SUDO_USER}:${SUDO_USER} /home/${SUDO_USER}/.ssh
 
 echo "  * Generate Key"
 ssh-keygen -t ed25519 -f ${SSH_KEY} -q -N "" -C "hp-${hp_cat}-${hp_id}"
