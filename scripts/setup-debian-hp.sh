@@ -220,8 +220,14 @@ echo "Setup logrotate:"
 echo "  * Backup configuration"
 cp ${CONFIG_LOG} ${CONFIG_LOG}.bak
 
+echo "  * Backup rsyslog configuration"
+if [[ -e /etc/logrotate.d/rsyslog ]] ; then
+  mv /etc/logrotate.d/rsyslog ${DIRECTORY}/rsyslog
+fi
+
 echo "  * Download configuration file"
 curl -s -o ${CONFIG_LOG} ${URL_LOG}
+
 
 echo "  * Enable logrotate.service"
 systemctl enable logrotate.service -q
