@@ -11,5 +11,5 @@
 # ------------------------------------------------------------------
 
 # Upload logs each night at 2 am. Repeat each day, each month.
-0 2 * * * root command upload-logs.sh
+0 2 * * * root /usr/local/bin/upload-logs.sh
 
