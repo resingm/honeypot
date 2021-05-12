@@ -183,6 +183,10 @@ Logs will be stored for 21 days. 21 days were chosen to have the files locally
 available on the honeypots. Just see it as a backup in case all other logs are
 somehow lost.
 
+Furthermore, if the file `/etc/logrotate.d/rsyslog` exists, then it is backed up
+and saved in the folder `/etc/honeypot/`. The reason is, that it usually
+interferes with the configuration I provide.
+
 
 ### Cron Jobs
 
