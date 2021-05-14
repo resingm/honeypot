@@ -56,6 +56,7 @@ cat ${LOG_SSH} | grep "sshd" >> ${LOG_OUT}
 
 # Extract Telnet logs
 cat ${LOG_TELNET} | grep "telnetd" >> ${LOG_OUT}
+cat ${LOG_SSH} | grep login | grep pts >> ${LOG_OUT}
 
 # Extract VNC logs
 
