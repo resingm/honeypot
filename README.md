@@ -9,16 +9,31 @@ my Bachelor thesis.
 The logging data of the honeypots will be stored in a central database. Also the
 ground-truth data of dataplane.org will be stored. The data set just stores the
 kind of information which is required to answer the research questions of the
-proposal. The only table in the database will have the following data fields:
+proposal. There will be two tables in the database as described below:
+
+**LogRecord:**
 
 ```
-id        : serial,
-sync_ts   : datetime,
-origin    : varchar ('dataplane' | 'residential' | 'campus' | 'cloud'),
-origin_id : varchar
+id        : serial
+origin    : varchar ('residential' | 'campus' | 'cloud')
+origin_id : integer
+sync_ts   : datetime
 timestamp : datetime
-ip        : integer
 category  : varchar ('ssh' | 'telnet' | 'vnc')
+ip        : integer
+username  : varchar
+```
+
+**DataplaneRecord:**
+
+```
+id        : serial
+sync_ts   : datetime
+timestamp : datetime
+asn       : integer
+asname    : varchar
+category  : varchar ('ssh' | 'telnet' | 'vnc')
+ip        : integer
 ```
 
 Most of the data fields should be clear by the name. The `sync_ts` is the

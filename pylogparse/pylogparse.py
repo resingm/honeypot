@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import asyncio
 import glob
-import logging
+import logging as log
 import os
 import re
+import sys
 
 from datetime import datetime
 
@@ -13,28 +15,26 @@ from yacf import Configuration
 
 CONFIG = "/etc/pylogparse.toml"
 
-log = logging.getLogger(__name__)
 
-
-class LogRecord(Model):
+class Log(Model):
     id = fields.IntField(pk=True)
     origin = fields.CharField(max_length=16)
     origin_id = fields.IntField()
     sync_ts = fields.DatetimeField()
     timestamp = fields.DatetimeField()
     category = fields.CharField(max_length=16)
-    ip = fields.IntField()
+    ip = fields.CharField(max_length=16)
     username = fields.CharField(max_length=32)
 
 
-class DataplaneRecord(Model):
+class Dataplane(Model):
     id = fields.IntField(pk=True)
     sync_ts = fields.DatetimeField()
     timestamp = fields.DatetimeField()
     asn = fields.IntField()
     asname = fields.CharField(max_length=255)
     category = fields.CharField(max_length=16)
-    ip = fields.IntField()
+    ip = fields.CharField(max_length=16)
 
 
 def get_file_lists(directory: str, import_log: str):
@@ -43,8 +43,11 @@ def get_file_lists(directory: str, import_log: str):
     log.info("Reading import log...")
     if not os.path.exists(import_log):
         log.debug(f"Import log {import_log} does not exist. Creating import log...")
-        with open(import_log, "w"):
-            pass
+        with open(import_log, "w+") as f:
+            f.write(
+                "# File includes log files which were already imported into the database"
+            )
+
         log.debug(f"Created import log {import_log}")
 
     with open(import_log, "r") as f:
@@ -57,8 +60,8 @@ def get_file_lists(directory: str, import_log: str):
 
     log.info("Checking for new files...")
 
-    if not directory.endswith("/*"):
-        directory += "/*"
+    if not directory.endswith("/**"):
+        directory += "/**"
 
     files = glob.glob(directory, recursive=True)
     log.debug(f"Found {len(files)} entries in {directory}.")
@@ -78,7 +81,8 @@ async def connect_db(db_url):
     await Tortoise.generate_schemas()
     log.debug(f"Connected to database {db[1]}.")
 
-def parse_line():
+
+def parse_line(line):
     timestamp = None
     category = ""
     ip = ""
@@ -89,22 +93,27 @@ def parse_line():
         category = "ssh"
     elif "telnetd" in line or "login" in line:
         category = "telnet"
-    elif "linuxvnc":
+    elif "linuxvnc" in line:
         category = "vnc"
     else:
         return None
 
     # Parse timestamp
-    split = l.split(" ")
-    day = split[1]
+    split = line.split(" ")
+    day = int(split[1])
     month = 5 if split[0] == "May" else 6
-    hour, minute, second = split[2].split(':')
+    hour, minute, second = split[2].split(":")
+    hour = int(hour)
+    minute = int(minute)
+    second = int(second)
     timestamp = datetime(2021, month, day, hour, minute, second)
 
     # parse IP
-    pattern = re.compoile(r'(\d{1,3}\.\d{1.3}\.\d{1,3}\.\d{1,3})')
-    ip = pattern.search(l)
-    if len(ip):
+    # pattern = re.compile(r"\d{1,3}\.\d{1.3}\.\d{1,3}\.\d{1,3}")
+    pattern = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+    ip = re.findall(pattern, line)
+    # ip = pattern.search(line)
+    if ip:
         ip = ip[0]
     else:
         return None
@@ -125,7 +134,7 @@ def parse_lines(hp_cat, hp_id, sync_ts, lines):
 
         (timestamp, category, ip, username) = values
 
-        rec = LogRecord(
+        rec = Log(
             origin=hp_cat,
             origin_id=hp_id,
             sync_ts=sync_ts,
@@ -134,18 +143,25 @@ def parse_lines(hp_cat, hp_id, sync_ts, lines):
             ip=ip,
             username=username,
         )
-        recs.
+        recs.append(rec)
 
     return recs
 
 
 async def main():
-    global log
-    log = logging.getLogger(__name__)
+    # Configure logging
+    root = log.getLogger()
+    root.setLevel(log.DEBUG)
+    handler = log.StreamHandler(sys.stdout)
+    handler.setLevel(log.DEBUG)
+    formatter = log.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
 
-    log.debug(f"Loading configuration {CONFIG}...")
+    log.info(f"Loading configuration {CONFIG}...")
     config = Configuration(CONFIG)
-    log.debug(f"Loaded configuration {CONFIG}")
+    config.load()
+    log.info(f"Loaded configuration {CONFIG}")
 
     # Configuration parameters
     directory = config.get("directory")
@@ -159,21 +175,30 @@ async def main():
     except Exception as e:
         log.error(f"Unknown exception occured: {str(e)}")
         log.debug("Details: ", exc_info=e)
+        return
 
     for f in files:
         _f = f.split("/")
-        hp_cat, hp_id, f_name = _f[-3], _f[-2], _f[-1]
-
-        lines = []
-        with open(f, "r") as _f:
-            lines = _f.readlines()
 
         try:
+            hp_cat, hp_id, f_name = _f[-3], int(_f[-2]), _f[-1]
+
+            lines = []
+            with open(f, "r") as _f:
+                lines = _f.readlines()
+
             # TODO: Load sync_ts from timestamp
             year, month, day, hour, minute, second = f_name[:-4].split("_")
+            year = int(year)
+            month = int(month)
+            day = int(day)
+            hour = int(hour)
+            minute = int(minute)
+            second = int(second)
+
             sync_ts = datetime(year, month, day, hour, minute, second)
             records = parse_lines(hp_cat, hp_id, sync_ts, lines)
-            created = await LogRecord.bulk_create(records, batch_size=500)
+            created = await Log.bulk_create(records, batch_size=500)
 
         except Exception as e:
             log.error(f"Unknown exception: {str(e)}")
@@ -181,4 +206,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    await main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.close()
