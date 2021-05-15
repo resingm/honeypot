@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pylogparse"
+version = "0.1.0"
+description = "System Log Parser to insert logs into PSQL database"
+authors = ["Max Resing <m.resing-1@student.utwente.nl>"]
+license = "GPL"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.17.2"}
+yacf = "^1.0.1"
+
+[tool.poetry.dev-dependencies]
+black = "^21.5b1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
