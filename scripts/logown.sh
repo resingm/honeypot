@@ -19,6 +19,6 @@
 
 LOG_DIR=/mnt/data/logs
 
-find ${LOG_DIR} -type f -print0 | xargs -o chown root:root
-find ${LOG_DIR} -type f -print0 | xargs -o chmod 644
+find ${LOG_DIR} -type f -print0 | xargs -0 chown root:root
+find ${LOG_DIR} -type f -print0 | xargs -0 chmod 644
 
