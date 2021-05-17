@@ -3,6 +3,14 @@
 The repository includes code snipptes & software which I wrote while working on
 my Bachelor thesis.
 
+## Note
+
+The scripts & data of this repository are not aimed to be production ready. They
+are the result of a quick solution for a given problem statement. The code is
+supposed to do one thing and to do it well: Run. It is far from perfect, not
+optimized on performance and neither well documented. The code is the result of
+quick and dirty solutions to get results quickly.
+
 
 ## Log Data
 
@@ -49,4 +57,13 @@ moment the honeypot logged the record. In case of the dataplane data, it is the
 ## Honeypots
 
 Check `config/README.md` for details regarding the honeypots.
+
+
+## TODOs
+
+* ~~Fetch dataplane.org data~~
+* Extract username from Telnet & SSH logs
+* Import log data into database
+* ~~Setup cron job to change log data ownership~~
+* Setup cron job to fetch data and store in home lab
 
