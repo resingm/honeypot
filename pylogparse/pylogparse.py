@@ -25,6 +25,7 @@ class Log(Model):
     category = fields.CharField(max_length=16)
     ip = fields.CharField(max_length=16)
     username = fields.CharField(max_length=32)
+    raw = fields.CharField(max_length=255)
 
 
 class Dataplane(Model):
@@ -45,7 +46,7 @@ def get_file_lists(directory: str, import_log: str):
         log.debug(f"Import log {import_log} does not exist. Creating import log...")
         with open(import_log, "w+") as f:
             f.write(
-                "# File includes log files which were already imported into the database"
+                "# File includes log files which were already imported into the database\n"
             )
 
         log.debug(f"Created import log {import_log}")
@@ -56,6 +57,7 @@ def get_file_lists(directory: str, import_log: str):
 
     imported = [x for x in imported if len(x)]
     imported = [x for x in imported if x[0] != "#"]
+    imported = [x.replace("\n", "") for x in imported]
     log.info(f"Read import log. Registered {len(imported)} files as already imported.")
 
     log.info("Checking for new files...")
@@ -88,39 +90,125 @@ def parse_line(line):
     ip = ""
     username = ""
 
+    search_terms = []
+
+    skip = False
+
     # Parse category:
     if "sshd" in line:
+        skip = "Failed password" not in line
+        skip = skip or ("Did not receive ident" in line)
         category = "ssh"
-    elif "telnetd" in line or "login" in line:
+
+        search_terms += ["Failed password for invalid user "]
+        search_terms += ["Failed password for "]
+
+    elif "login[" in line:
+        skip = "FAILED LOGIN" not in line
         category = "telnet"
+
+        search_terms += ["' FOR '"]
     elif "linuxvnc" in line:
+        skip = "Got connection from" not in line
         category = "vnc"
     else:
         return None
 
+    if skip:
+        # If lines do not start with defined phrase, it can be skipped.
+        return None
+
+    parts = line.split("]: ")
+    if len(parts) <= 1:
+        return None
+
+    s = parts[1]
+
+    for term in search_terms:
+        if s.startswith(term):
+            i = len(term)
+
+            # increase i as long as i is not a space or a "'"
+            while s[i] not in "' ":
+                i += 1
+
+            i += 1
+            username = s[len(term) : i]
+            break
+
+    parts = line.split(" ")
+
     # Parse timestamp
-    split = line.split(" ")
-    day = int(split[1])
-    month = 5 if split[0] == "May" else 6
-    hour, minute, second = split[2].split(":")
+    day = int(parts[1])
+    month = 5 if parts[0] == "May" else 6
+    hour, minute, second = parts[2].split(":")
     hour = int(hour)
     minute = int(minute)
     second = int(second)
     timestamp = datetime(2021, month, day, hour, minute, second)
 
     # parse IP
-    # pattern = re.compile(r"\d{1,3}\.\d{1.3}\.\d{1,3}\.\d{1,3}")
-    pattern = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+    pattern = "(\d{1,3}(\.|-)\d{1,3}(\.|-)\d{1,3}(\.|-)\d{1,3})"
     ip = re.findall(pattern, line)
     # ip = pattern.search(line)
     if ip:
         ip = ip[0]
+
+        if isinstance(ip, tuple):
+            ip = ip[0]
     else:
         return None
 
-    # TODO: Try to parse the username
-    username = ""
+    ip = ip.replace("-", ".")
     return (timestamp, category, ip, username)
+
+
+def parse_dataplane_lines(sync_ts, lines):
+    recs = []
+
+    for l in lines:
+        # Continue on empty line
+        if not len(l):
+            continue
+
+        # Continue on commented line
+        if l[0] == "#":
+            continue
+
+        arr = [x.strip(" ") for x in l.split("|")]
+        if len(arr) < 5:
+            continue
+
+        asn = int(arr[0]) if arr[0].isnumeric() else -1
+        asname = arr[1]
+        ip = arr[2]
+        timestamp = datetime.fromisoformat(arr[3])
+        category = ""
+
+        if ":" in ip:
+            # Skip IPv6 addresses
+            continue
+
+        if "ssh" in arr[4]:
+            category = "ssh"
+        elif "telnet" in arr[4]:
+            category = "telnet"
+        elif "vnc" in arr[4]:
+            category = "vnc"
+        else:
+            continue
+
+        rec = Dataplane(
+            sync_ts=sync_ts,
+            timestamp=timestamp,
+            asn=asn,
+            asname=asname,
+            category=category,
+            ip=ip,
+        )
+        recs.append(rec)
+
+    return recs
 
 
 def parse_lines(hp_cat, hp_id, sync_ts, lines):
@@ -142,6 +230,7 @@ def parse_lines(hp_cat, hp_id, sync_ts, lines):
             category=category,
             ip=ip,
             username=username,
+            raw=(l[:250] + "[...]" if len(l) > 255 else l),
         )
         recs.append(rec)
 
@@ -151,9 +240,9 @@ def parse_lines(hp_cat, hp_id, sync_ts, lines):
 async def main():
     # Configure logging
     root = log.getLogger()
-    root.setLevel(log.DEBUG)
+    root.setLevel(log.INFO)
     handler = log.StreamHandler(sys.stdout)
-    handler.setLevel(log.DEBUG)
+    handler.setLevel(log.INFO)
     formatter = log.Formatter("%(asctime)s [%(levelname)s] %(message)s")
     handler.setFormatter(formatter)
     root.addHandler(handler)
@@ -181,13 +270,16 @@ async def main():
         _f = f.split("/")
 
         try:
-            hp_cat, hp_id, f_name = _f[-3], int(_f[-2]), _f[-1]
+            hp_cat, hp_id, f_name = _f[-3], _f[-2], _f[-1]
+            if hp_id == "dataplane":
+                hp_cat = hp_id
+            else:
+                hp_id = int(hp_id)
 
             lines = []
             with open(f, "r") as _f:
                 lines = _f.readlines()
 
-            # TODO: Load sync_ts from timestamp
             year, month, day, hour, minute, second = f_name[:-4].split("_")
             year = int(year)
             month = int(month)
@@ -197,8 +289,32 @@ async def main():
             second = int(second)
 
             sync_ts = datetime(year, month, day, hour, minute, second)
-            records = parse_lines(hp_cat, hp_id, sync_ts, lines)
-            created = await Log.bulk_create(records, batch_size=500)
+
+            if hp_cat == "dataplane":
+                log.info(f"Processing new file: {f}")
+                log.info("Extracting records from dataplane download...")
+                records = parse_dataplane_lines(sync_ts, lines)
+                log.info(
+                    f"Found {len(records)} records in a total of {len(lines)} lines."
+                )
+                log.info("Inserting records into database...")
+                await Dataplane.bulk_create(records, batch_size=500)
+                log.info(f"Inserted {len(records)} new records in database.")
+            else:
+                log.info(f"Processing new file: {f}")
+                records = parse_lines(hp_cat, hp_id, sync_ts, lines)
+                log.info("Extracting records from log file...")
+                log.info(
+                    f"Found {len(records)} records in a total of {len(lines)} lines."
+                )
+                log.info("Inserting records into database...")
+                await Log.bulk_create(records, batch_size=500)
+                log.info(f"Inserted {len(records)} new records in database.")
+
+            with open(import_log, "a") as _f:
+                log.info(f"Save file {f} as processed")
+                _f.write(f)
+                _f.write("\n")
 
         except Exception as e:
             log.error(f"Unknown exception: {str(e)}")
