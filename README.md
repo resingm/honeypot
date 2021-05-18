@@ -65,5 +65,5 @@ Check `config/README.md` for details regarding the honeypots.
 * Extract username from Telnet & SSH logs
 * Import log data into database
 * ~~Setup cron job to change log data ownership~~
-* Setup cron job to fetch data and store in home lab
+* ~~Setup cron job to fetch data and store in home lab~~
 
