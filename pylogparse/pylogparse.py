@@ -24,8 +24,8 @@ class Log(Model):
     sync_ts = fields.DatetimeField()
     timestamp = fields.DatetimeField()
     category = fields.CharField(max_length=16)
-    ip = fields.CharField(max_length=16)
-    username = fields.CharField(max_length=32)
+    ip = fields.CharField(max_length=64)
+    username = fields.CharField(max_length=255)
     raw = fields.CharField(max_length=255)
 
 
@@ -36,7 +36,7 @@ class Dataplane(Model):
     asn = fields.IntField()
     asname = fields.CharField(max_length=255)
     category = fields.CharField(max_length=16)
-    ip = fields.CharField(max_length=16)
+    ip = fields.CharField(max_length=64)
 
 
 def get_file_lists(directory: str, import_log: str):
