@@ -186,6 +186,8 @@ def parse_dataplane_lines(sync_ts, lines):
         asn = int(arr[0]) if arr[0].isnumeric() else -1
         asname = arr[1]
         ip = arr[2]
+        # Normalize IP string
+        ip = ".".join([x.lstrip("0") for x in ip.split(".")])
         timestamp = datetime.fromisoformat(arr[3])
         category = ""
 
