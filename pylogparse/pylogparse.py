@@ -126,15 +126,16 @@ def parse_line(line):
     s = parts[1]
 
     for term in search_terms:
-        if s.startswith(term):
-            i = len(term)
+        # if s.startswith(term):
+        if term in s:
+            i = s.find(term) + len(term)
+            j = i
 
             # increase i as long as i is not a space or a "'"
-            while s[i] not in "' ":
-                i += 1
+            while s[j] not in "' ":
+                j += 1
 
-            i += 1
-            username = s[len(term) : i]
+            username = s[i:j]
             break
 
     parts = line.split(" ")
