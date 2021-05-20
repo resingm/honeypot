@@ -14,7 +14,7 @@ from tortoise import Tortoise, fields
 from yacf import Configuration
 
 CONFIG = "/etc/pylogparse.toml"
-LOGLVL = log.DEBUG
+LOGLVL = log.INFO
 
 
 class Log(Model):
@@ -264,7 +264,7 @@ async def main():
         await connect_db(db_url)
     except Exception as e:
         log.error(f"Unknown exception occured: {str(e)}")
-        log.debug("Details: ", exc_info=e)
+        log.error("Details: ", exc_info=e)
         return
 
     for f in files:
@@ -319,7 +319,7 @@ async def main():
 
         except Exception as e:
             log.error(f"Unknown exception: {str(e)}")
-            log.debug("Details: ", exc_info=e)
+            log.error("Details: ", exc_info=e)
 
 
 if __name__ == "__main__":
