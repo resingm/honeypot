@@ -160,7 +160,10 @@ def parse_line(line):
     else:
         return None
 
+    # Normalize IP input (alter '-' to '.' and remove leading zeros in octets)
     ip = ip.replace("-", ".")
+    ip = ".".join([x.lstrip("0") for x in ip.split(".")])
+
     return (timestamp, category, ip, username)
 
 
