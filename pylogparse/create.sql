@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS "log" (
     "timestamp" TIMESTAMPTZ NOT NULL,
     "category" VARCHAR(16) NOT NULL,
     "ip" INET NOT NULL,
-    "username" VARCHAR(32) NOT NULL,
+    "username" VARCHAR(255) NOT NULL,
     "raw" VARCHAR(255) NOT NULL
 );
