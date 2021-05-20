@@ -14,6 +14,7 @@ from tortoise import Tortoise, fields
 from yacf import Configuration
 
 CONFIG = "/etc/pylogparse.toml"
+LOGLVL = log.DEBUG
 
 
 class Log(Model):
@@ -240,9 +241,9 @@ def parse_lines(hp_cat, hp_id, sync_ts, lines):
 async def main():
     # Configure logging
     root = log.getLogger()
-    root.setLevel(log.INFO)
+    root.setLevel(LOGLVL)
     handler = log.StreamHandler(sys.stdout)
-    handler.setLevel(log.INFO)
+    handler.setLevel(LOGLVL)
     formatter = log.Formatter("%(asctime)s [%(levelname)s] %(message)s")
     handler.setFormatter(formatter)
     root.addHandler(handler)
