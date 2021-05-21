@@ -28,8 +28,9 @@ origin_id : integer
 sync_ts   : datetime
 timestamp : datetime
 category  : varchar ('ssh' | 'telnet' | 'vnc')
-ip        : integer
+ip        : inet
 username  : varchar
+raw       : varchar(255)
 ```
 
 **DataplaneRecord:**
@@ -41,7 +42,7 @@ timestamp : datetime
 asn       : integer
 asname    : varchar
 category  : varchar ('ssh' | 'telnet' | 'vnc')
-ip        : integer
+ip        : inet
 ```
 
 Most of the data fields should be clear by the name. The `sync_ts` is the
@@ -62,8 +63,8 @@ Check `config/README.md` for details regarding the honeypots.
 ## TODOs
 
 * ~~Fetch dataplane.org data~~
-* Extract username from Telnet & SSH logs
-* Import log data into database
+* ~~Extract username from Telnet & SSH logs~~
+* ~~Import log data into database~~
 * ~~Setup cron job to change log data ownership~~
 * ~~Setup cron job to fetch data and store in home lab~~
 
