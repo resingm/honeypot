@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+# ------------------------------------------------------------------------------
+#
+#   pylogparse.py
+#
+# The script parses and imports those files which are not yet processed and
+# entered in the database. One of the dependencies is tortoise-orm. Tortoise-ORM
+# does not support the Postgres datatype INET. Thus, it is recommended to run
+# the create.sql script manually before first starting this script.
+#
+# ------------------------------------------------------------------------------
+
 import asyncio
 import glob
 import logging as log
@@ -14,16 +25,16 @@ from tortoise import Tortoise, fields
 from yacf import Configuration
 
 CONFIG = "/etc/pylogparse.toml"
-LOGLVL = log.INFO
+LOGLVL = log.DEBUG
 
 
 class Log(Model):
     id = fields.IntField(pk=True)
-    origin = fields.CharField(max_length=16)
+    origin = fields.CharField(max_length=16, index=True)
     origin_id = fields.IntField()
     sync_ts = fields.DatetimeField()
     timestamp = fields.DatetimeField()
-    category = fields.CharField(max_length=16)
+    category = fields.CharField(max_length=16, index=True)
     ip = fields.CharField(max_length=64)
     username = fields.CharField(max_length=255)
     raw = fields.CharField(max_length=255)
@@ -35,7 +46,7 @@ class Dataplane(Model):
     timestamp = fields.DatetimeField()
     asn = fields.IntField()
     asname = fields.CharField(max_length=255)
-    category = fields.CharField(max_length=16)
+    category = fields.CharField(max_length=16, index=True)
     ip = fields.CharField(max_length=64)
 
 
