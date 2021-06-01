@@ -23,3 +23,17 @@ CREATE TABLE IF NOT EXISTS "log" (
 
 CREATE INDEX IF NOT EXISTS "idx_log_origin_802b2d" ON "log" ("origin");
 CREATE INDEX IF NOT EXISTS "idx_log_categor_456a64" ON "log" ("category");
+
+CREATE TABLE IF NOT EXISTS "ip" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "ip" INET NOT NULL,
+    "city" VARCHAR(64) NOT NULL,
+    "region" VARCHAR(64) NOT NULL,
+    "longitude" DOUBLE PRECISION,
+    "latitude" DOUBLE PRECISION,
+    "org" VARCHAR(255) NOT NULL,
+    "postal" VARCHAR(16) NOT NULL,
+    "timezone" VARCHAR(64) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "idx_ip_ip" ON "ip" ("ip");
