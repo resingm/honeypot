@@ -25,12 +25,12 @@ dates = [parser.parse(d) for d in dates]
 # Get the date filters per week day.
 # Consider that each filter consists of a tuple (lower & upper bound)
 
-get_i_weekday(day: int):
+def get_i_weekday(day: int):
     """Returns a list of indices which represent the corresponding week day."""
     b = day % 7
     return [b, b + 7]
 
-get_name_weekday(day: int) -> str:
+def get_name_weekday(day: int) -> str:
     """Returns the name of the weekday."""
     if day == 0:
         return "Monday"
@@ -48,4 +48,23 @@ get_name_weekday(day: int) -> str:
         return "Sunday"
     else:
         raise ValueError(f"Invalid day of the week {day}")
-        
+    
+    
+# honeypots
+
+honeypots = [
+    ('campus', 1),
+    ('campus', 2),
+    ('campus', 3),
+    ('residential', 6),
+    ('residential', 7),
+    ('residential', 8),
+    ('residential', 9),
+    ('cloud', 12),
+    ('cloud', 13),
+    ('cloud', 14),
+    ('cloud', 15),
+]
+
+# categories
+categories = ['ssh', 'telnet']
