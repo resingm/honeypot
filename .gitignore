@@ -10,3 +10,5 @@ target/
 
 **/.vscode/
 data/
+spark/configuration.py
+
